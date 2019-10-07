@@ -5,21 +5,24 @@
 
 #define URL "/api/v0/exec"
 
+const char* Warp10::url = "/api/v0/exec";
 
-WarpTen::WarpTen() {
+Warp10::Warp10() {
 
 }
 
-const char* WarpTen::url = "/api/v0/exec";
+String Warp10::execScript(const char* warpScript) {
+  return this->execScript(String(warpScript));
+}
 
-unsigned long WarpTen::getTimestamp() {
+String Warp10::execScript(String warpScript) {
   HTTPClient http;
 
   Serial.println("Requesting Timestamp");
   int beginResult = http.begin(String("https://") + WARP10_HOST + this->url, FINGERPRINT);
   http.addHeader("Content-Type", "application/json");
   
-  int httpCode = http.POST("NOW");
+  int httpCode = http.POST(warpScript);
   String response = http.getString();
 
   Serial.print("beginResult: ");
@@ -35,6 +38,12 @@ unsigned long WarpTen::getTimestamp() {
   Serial.println();
   
   http.end();
+
+  return response;
+}
+
+unsigned long Warp10::getTimestamp() {
+  String response = this->execScript("NOW");
 
   int responseLength =  response.length();
   char* timestampStr = (char*)malloc(responseLength-6);

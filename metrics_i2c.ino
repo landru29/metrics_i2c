@@ -5,6 +5,7 @@
 #include "led.h"
 #include "communication.h"
 #include <Wire.h>
+#include <Ticker.h>
 
 #define READ_BUFFER_SIZE 200
 #define WRITE_BUFFER_SIZE 50
@@ -13,23 +14,30 @@
 char resultBuffer[WRITE_BUFFER_SIZE];
 char resultBufferLength = 0;
 
+volatile long globalTimestamp = 0;
+
 WifiConnect* myWifi;
 Metrics* metrics;
-WarpTen* warp10;
+Warp10* warp10;
+Ticker timestampTicker;
 
-
+void tickTimestamp() {
+  globalTimestamp++;
+}
 
 
 void setup() {
 
   myWifi = new WifiConnect("metrics");
   metrics = new Metrics();
-  warp10 = new WarpTen();
+  warp10 = new Warp10();
 
   Wire.begin(I2C_ADDRESS);
   Wire.onReceive(receiveEvent);
   
   Serial.begin(9600);
+
+  timestampTicker.attach(1, tickTimestamp);
   
 }
 
@@ -59,15 +67,20 @@ void receiveEvent(int howMany) {
         bool wifiResult = myWifi->startWPSPBC();
         resultBuffer[0] = wifiResult ? 1 : 0;
         resultBufferLength = 1;
+        break;
 
+      case COMMAND_REQUEST_TIMESTAMP:
+        Serial.println("Request timestamp");
+        globalTimestamp = warp10->getTimestamp();
+        // Continue ...
+      
       case COMMAND_GET_TIMESTAMP:
-        Serial.println("Get timestamp");
-        long ts = warp10->getTimestamp();
-        char *buf = (char*)&ts;
+        char *buf = (char*)&globalTimestamp;
         for(int i=0; i<4; i++) {
           resultBuffer[i] = buf[i];
         }
         resultBufferLength = 4;
+        break;
       
       case COMMAND_METRICS_FLUSH:
         int httpCode = metrics->flushData();
@@ -76,6 +89,7 @@ void receiveEvent(int howMany) {
           resultBuffer[i] = buf[i];
         }
         resultBufferLength = 2;
+        break;
 
       default:
         Serial.print("Unknown command ");

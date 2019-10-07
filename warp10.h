@@ -2,10 +2,12 @@
 #define __WARP_TEN__H__
 
 
-class WarpTen {
+class Warp10 {
   public:
-    WarpTen();
+    Warp10();
 
+    String execScript(String warpScript);
+    String execScript(const char* warpScript);
     unsigned long getTimestamp();
 
   private:
