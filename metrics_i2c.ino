@@ -2,7 +2,7 @@
 #include "metrics-server.h"
 
 void setup() {
-  initMetrics("metrics");
+  MetricsServer::initMetrics();
 }
 
 void loop() {

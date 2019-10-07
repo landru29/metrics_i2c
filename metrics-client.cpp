@@ -85,3 +85,17 @@ int MetricsClient::flushMetrics() {
     }
     return 0;
 }
+
+bool MetricsClient::ping() {
+    Wire.beginTransmission(I2C_ADDRESS);
+    Wire.write(COMMAND_PING);
+    Wire.endTransmission();
+    Wire.requestFrom(I2C_ADDRESS, 1);
+    this->waitForData();
+    if (Wire.available() == 1) {
+        char buf = Wire.read();
+        bool *result = (bool*)buf;
+        return *result;
+    }
+    return false;
+}

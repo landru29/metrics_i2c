@@ -2,27 +2,25 @@
 #include "metrics-server.h"
 #include "metrics-client.h"
 #include <Wire.h>
-#include <Ticker.h>
-
-WifiConnect* wifi;
-Metrics* metrics;
-Warp10* warp10;
-Ticker* timestampTicker;
-char resultBuffer[WRITE_BUFFER_SIZE];
-char resultBufferLength = 0;
-volatile long timestamp = 0;
 
 
-void tickTimestamp() {
+WifiConnect* MetricsServer::wifi = new WifiConnect("metrics");
+Metrics* MetricsServer::metrics = new Metrics();
+Warp10* MetricsServer::warp10 = new Warp10();
+Ticker* MetricsServer::timestampTicker = new Ticker();
+char MetricsServer::resultBuffer[WRITE_BUFFER_SIZE] = "";
+char MetricsServer::resultBufferLength = 0;
+long MetricsServer::timestamp = 0;
+
+void MetricsServer::tickTimestamp() {
   timestamp++;
 }
 
-
-void registerTsTicker() {
-    timestampTicker->attach(1, tickTimestamp);
+void MetricsServer::registerTsTicker() {
+  timestampTicker->attach(1, tickTimestamp);
 }
 
-int wireRead(char* buf, int len) {
+int MetricsServer::wireRead(char* buf, int len) {
   int cursor = 0;
   while ((Wire.available()>0) && (cursor < len)) {
     buf[cursor++] = Wire.read();
@@ -30,7 +28,7 @@ int wireRead(char* buf, int len) {
   return cursor;
 }
 
-void receiveEvent(int howMany) {
+void MetricsServer::receiveEvent(int howMany) {
   char buffer[READ_BUFFER_SIZE];
   char command = 0;
 
@@ -76,14 +74,18 @@ void receiveEvent(int howMany) {
         break;
       }
 
+      case COMMAND_PING: {
+        resultBuffer[0] = 1;
+        resultBufferLength = 2;
+        break;
+      }
+
       default: {
         Serial.print("Unknown command ");
         Serial.println(command);
         return;
       }
     }
-
-
   } else {
     for(int i=0; i<resultBufferLength; i++) {
       Wire.write(resultBuffer[i]);
@@ -92,17 +94,13 @@ void receiveEvent(int howMany) {
 
 }
 
-void registerI2C() {
+void MetricsServer::registerI2C() {
     Wire.begin(I2C_ADDRESS);
     Wire.onReceive(receiveEvent);
 }
 
 
-void initMetrics(const char* hostname) {
-    wifi = new WifiConnect(hostname);
-    metrics = new Metrics();
-    warp10 = new Warp10();
-    timestampTicker = new Ticker();
+void MetricsServer::initMetrics() {
     registerI2C();
     registerTsTicker();
 }

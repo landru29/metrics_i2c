@@ -5,10 +5,11 @@
 
 #define TIMEOUT 10
 
-#define COMMAND_WIFI_CONNECT        0x01
-#define COMMAND_REQUEST_TIMESTAMP   0x02
-#define COMMAND_GET_TIMESTAMP       0x03
-#define COMMAND_METRICS_FLUSH       0x04
+#define COMMAND_PING                0x01
+#define COMMAND_WIFI_CONNECT        0x02
+#define COMMAND_REQUEST_TIMESTAMP   0x03
+#define COMMAND_GET_TIMESTAMP       0x04
+#define COMMAND_METRICS_FLUSH       0x05
 
 
 class MetricsClient {
@@ -19,6 +20,8 @@ class MetricsClient {
     long getTimestamp();
     long requestTimestamp();
     int flushMetrics();
+    bool ping();
+
   private:
     bool waitForData();
 };
