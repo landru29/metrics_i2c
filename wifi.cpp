@@ -12,7 +12,7 @@ extern "C" {
 }
 #endif
 
-WifiConnect::WifiConnect(char* hostname) {
+WifiConnect::WifiConnect(const char* hostname) {
   new Led(LED_BUILTIN);     // Initialize the LED_BUILTIN pin as an output
   WiFi.hostname(hostname);
   Serial.println("Try to connect");

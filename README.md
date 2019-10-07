@@ -94,7 +94,7 @@ Include `communication.h` in your code. In your setup, just put:
 Wire.begin()
 ```
 
-Then you can use the class `Communication`
+Then you can use the class `MetricsClient`
 
 Do not forget to connect I2C to the slave:
 

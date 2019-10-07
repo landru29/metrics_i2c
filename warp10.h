@@ -1,6 +1,9 @@
 #ifndef __WARP_TEN__H__
 #define __WARP_TEN__H__
 
+#include <Arduino.h>
+#include <string.h>
+
 
 class Warp10 {
   public:

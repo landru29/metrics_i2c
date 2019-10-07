@@ -1,13 +1,13 @@
-#include "communication.h"
+#include "metrics-client.h"
 #include <Wire.h>
 #include <Arduino.h>
 
 
-Communication::Communication() {
+MetricsClient::MetricsClient() {
 
 }
 
-bool Communication::waitForData() {
+bool MetricsClient::waitForData() {
     int counter = 0;
     int wait = 200;
     while(!Wire.available() && wait * counter / 1000 < TIMEOUT) {
@@ -17,7 +17,7 @@ bool Communication::waitForData() {
     return !!Wire.available();
 }
 
-bool Communication::wifiConnect() {
+bool MetricsClient::wifiConnect() {
     Wire.beginTransmission(I2C_ADDRESS);
     Wire.write(COMMAND_WIFI_CONNECT);
     Wire.endTransmission();
@@ -30,7 +30,7 @@ bool Communication::wifiConnect() {
 }
 
 
-long Communication::requestTimestamp() {
+long MetricsClient::requestTimestamp() {
     Wire.beginTransmission(I2C_ADDRESS);
     Wire.write(COMMAND_REQUEST_TIMESTAMP);
     Wire.endTransmission();
@@ -49,7 +49,7 @@ long Communication::requestTimestamp() {
 
 }
 
-long Communication::getTimestamp() {
+long MetricsClient::getTimestamp() {
     Wire.beginTransmission(I2C_ADDRESS);
     Wire.write(COMMAND_GET_TIMESTAMP);
     Wire.endTransmission();
@@ -68,7 +68,7 @@ long Communication::getTimestamp() {
 
 }
 
-int Communication::flushMetrics() {
+int MetricsClient::flushMetrics() {
     Wire.beginTransmission(I2C_ADDRESS);
     Wire.write(COMMAND_METRICS_FLUSH);
     Wire.endTransmission();

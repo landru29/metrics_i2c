@@ -3,7 +3,7 @@
 
 class WifiConnect {
   public:
-    WifiConnect(char* hostname);
+    WifiConnect(const char* hostname);
     bool startWPSPBC();
 
   private:
